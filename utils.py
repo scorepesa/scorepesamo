@@ -76,7 +76,7 @@ class Helper():
         _msisdn = re.sub(r"\s+", '', msisdn)
         res = re.match('^(?:\+?(?:[1-9]{3})|0)?([0-9]{9})$', _msisdn)
         if res:
-           return "255" + res.group(1)
+           return "254" + res.group(1)
         return None
 
     def create_speed_dial_history(self, data):
@@ -223,12 +223,12 @@ class Helper():
         return games_result
         
     def get_matches(self,tab='Mechi Kali', page=1, limit=10, match_id=None):
-        tab = tab if tab in ['Mechi Kali', 'Zijazo', 'Kesho'] else 'Mechi Kali'
+        tab = tab if tab in ['top', 'today', 'tomorrow'] else 'top'
         start_date = " now() "
         order_by = " m.priority desc, c.priority desc, m.start_time asc "
-        if tab == 'Zijazo':
+        if tab == 'top':
             order_by = " m.start_time asc, m.priority desc, c.priority desc "
-        elif tab == 'Kesho':
+        elif tab == 'tomorrow':
             order_by = " m.start_time asc, m.priority desc, c.priority " 
             start_date = " now() + interval 1 day "
         offset = (int(page)-1)*int(limit)

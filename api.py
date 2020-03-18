@@ -76,13 +76,16 @@ def sms_gateway_send_sms(message):
     else:
         url = bulk_configs["url"]
         current_app.logger.info("BULK URL %s" % (url,))
-        sender = bulk_configs['access_code']
+        sender = bulk_configs['bulk_code']
+        dlr_endpoint = bulk_configs['dlr_endpoint']
         sms_payload = {
+           "dlr_endpoint":dlr_endpoint,
+           "package_id":"",
            "msisdn":msisdn,
            "message":message.get('message') or message.get('text'),
-           "short_code":message.get('access_code') or sender,
+           "source":sender,
            "access_code":sender,
-           "reference":message.get('outbox_id'),
+           "unique_id":message.get('outbox_id'),
            "sdp_id":message.get('service_id') or bulk_configs['service_id']
         }
 

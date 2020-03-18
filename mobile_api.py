@@ -112,13 +112,17 @@ def prepare_match_data(games_result):
             start_time, match_time, sbv, priority, side_bets = result
         odds_dict = {}
         for o in odds.split(','):
-            #current_app.logger.info("Matches reading o ==> %s" % o)
+            current_app.logger.info("Matches reading o ==> %s" % o)
             o = _tostr(o)
             sub_type_id = o.split('^')[0]
             o = o.split('^')[1]
             special_bet_value = o.split('#')[0]
+            
             #print "matches ==>", o
-            o = o.split('#')[1]
+            try:
+                o = o.split('#')[1]
+            except:
+                continue
             sub_type = o.split('|')[0]
             real_odd = {o.split('|')[1].split('=')[0] : o.split('|')[1].split('=')[1],
                 'special_bet_value':special_bet_value, 'sub_type_id':sub_type_id}
@@ -201,17 +205,19 @@ class BetDetails(Resource):
 
 class MyBets(Resource):
 
-    def params(self):
+    def get_params(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('token', type=str)
+        parser.add_argument('token', type=str, required=True)
         parser.add_argument('limit', type=int)
         parser.add_argument('page', type=int)
         return parser.parse_args()
 
     def post(self):
-        data = self.params()
+        data = self.get_params()
+        current_app.logger.info("Reading my bets request => %r" % data)
         helper = Helper(current_app.logger)
-        data = helper.get_mybets(data.get('token'), data.get('page'), data.get('limit'))
+        data = helper.get_mybets(data.get('token'), data.get('page') or 1, data.get('limit') or 10)
+        current_app.logger.info("Reading my bets get_mybets => %r" % data)
         datas = []
         for d in data:
             created, bet_id, total_matches, jackpot_bet_id, total_odd, bet_message, bet_amount, possible_win, status = d
@@ -221,6 +227,8 @@ class MyBets(Resource):
                     'possible_win':float(possible_win), 'status':status,
                     'bet_amount':float(bet_amount)}
             datas.append(value)
+        
+        current_app.logger.info("Reading my bets get_mybets FINAL String  %r" % datas)
         resp = make_response(json.dumps(datas), 200)
         return resp
 
@@ -288,8 +296,8 @@ class Sports(Resource):
         data = self.params()
         helper = Helper(current_app.logger)
         sport_id = data.get('id')
-        page = data.get('page', 1)
-        limit = data.get('limit', 10)
+        page = data.get('page') or 1
+        limit = data.get('limit') or 10
         categories = helper.get_active_categories(sport_id, page, limit)
         datas = []
         for cat in categories:
