@@ -27,7 +27,7 @@ inflect==0.2.5
 iniparse==0.4
 ipaddress==1.0.16
 itsdangerous==0.24
-Jinja2==2.8
+Jinja2==2.11.3
 MarkupSafe==0.23
 #perf==0.1
 phpserialize==1.3
